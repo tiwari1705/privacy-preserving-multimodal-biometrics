@@ -5,7 +5,9 @@ matplotlib
 seaborn
 torch
 torchvision
-jupyter
-opencv-python
 Pillow
+tqdm
+opencv-python
+facenet-pytorch
 tenseal
+jupyter

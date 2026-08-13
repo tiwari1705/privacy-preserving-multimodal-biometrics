@@ -1,134 +1,165 @@
-# A System-Level Security–Utility Evaluation Framework for Privacy-Preserving Multimodal Biometric Verification Using Cancellable Templates and CKKS Homomorphic Encryption
+# Privacy-Preserving Multimodal Biometric Verification
 
-## Project Overview
+This repository contains the implementation and experimental notebook for the **privacy-preserving multimodal biometric verification** project described in the accompanying final report.
 
-This project presents a system-level security–utility evaluation framework for privacy-preserving multimodal biometric verification using face, fingerprint, and iris modalities.
+The project studies biometric verification using **face, fingerprint, and iris** modalities, with privacy protection based on **cancellable biometric templates**, evaluation under **same-key and cross-key conditions**, **score-level multimodal fusion**, and **CKKS encrypted matching**.
 
-The work extends a baseline multimodal biometric verification framework by incorporating:
+## Project framework
 
-- Cancellable biometric template transformation
-- Same-key protected verification
-- Cross-key evaluation for practical unlinkability analysis
-- Protected score-level fusion
-- CKKS-based encrypted matching
-- Recovery-gain analysis
-- Latency and security–utility analysis
+The implemented experimental workflow is:
 
-The objective is not to propose a new biometric recognition model, cancellable transformation algorithm, or cryptographic scheme. Instead, the project evaluates how these components interact within a common multimodal verification protocol.
+```text
+Face / Fingerprint / Iris
+          |
+          v
+   Feature Embeddings
+          |
+          v
+   Normalization
+          |
+          v
+ Cancellable Transformation
+          |
+          v
+   Protected Templates
+       /       \
+      v         v
+ Same-Key    Cross-Key
+ Evaluation  Evaluation
+      |          |
+      +----+-----+
+           |
+           v
+   Score-Level Fusion
+           |
+           v
+ CKKS Encrypted Matching
+           |
+           v
+ Security / Utility / Runtime Evaluation
+```
 
----
+The final report describes this as the main experimental framework: embedding extraction and normalization, cancellable transformation, protected-template matching, same-key/cross-key evaluation, score-level fusion, CKKS encrypted matching, and security/utility/runtime analysis.
 
-## Research Objectives
+## Repository structure
 
-The main objectives are:
+```text
+.
+├── README.md
+├── VERIFICATION.md
+├── requirements.txt
+├── .gitignore
+│
+├── src/
+│   ├── 01_prepare_data.py
+│   ├── 02_fingerprint.py
+│   ├── 03_face.py
+│   ├── 04_iris.py
+│   ├── 05_ckks.py
+│   ├── 06_fusion.py
+│   ├── 07_security_analysis.py
+│   └── 08_final_results.py
+│
+├── notebooks/
+│   └── final_pipeline_kaggle.ipynb
+│
+├── results/
+│   ├── figures/
+│   └── tables/
+│
+├── data/
+│   └── README.md
+│
+├── checkpoints/
+│   └── README.md
+│
+└── docs/
+    └── final_report.pdf
+```
 
-1. Evaluate the effect of cancellable template transformation on face, fingerprint, and iris verification.
-2. Compare binary and non-binary protected representations across projection dimensions.
-3. Evaluate protected-template utility using same-key verification.
-4. Analyse cross-key behaviour as empirical evidence of practical unlinkability and renewability.
-5. Evaluate protected score-level fusion as a mechanism for recovering utility after template protection.
-6. Examine whether CKKS encrypted matching preserves protected-domain verification behaviour.
-7. Analyse the overall security–utility and latency trade-off.
+## What each code file contains
 
----
+### Data preparation
+`src/01_prepare_data.py`
+
+Creates the subject-level experimental split and verification-pair preparation used by the experiments.
+
+### Fingerprint
+`src/02_fingerprint.py`
+
+Contains fingerprint preprocessing/training/embedding and verification-related processing used in the project.
+
+### Face
+`src/03_face.py`
+
+Contains the face embedding and verification pipeline used in the experiments.
+
+### Iris
+`src/04_iris.py`
+
+Contains the iris preprocessing/training/embedding and verification pipeline.
+
+### Cancellable templates + CKKS
+`src/05_ckks.py`
+
+Contains the cancellable-template transformation and the true CKKS encrypted matching experiments for the biometric modalities.
+
+### Multimodal fusion
+`src/06_fusion.py`
+
+Contains plain-domain and encrypted-domain **score-level fusion**, including multimodal/trimodal fusion and fusion-weight evaluation.
+
+### Security and revocability
+`src/07_security_analysis.py`
+
+Contains the **same-key, cross-key, revocability, unlinkability, irreversibility, and security–utility analysis** used in the experiments.
+
+### Final result generation
+`src/08_final_results.py`
+
+Contains the final result/table/figure-generation logic used for summarizing the experiments.
+
+## Notebook
+
+`notebooks/final_pipeline_kaggle.ipynb` is the original consolidated Kaggle experiment notebook. It is retained so that the complete experimental workflow and execution history remain available alongside the separated source files.
+
+## Results
+
+The repository intentionally keeps the result directories clean:
+
+- `results/figures/` — place the final figures used in the report here.
+- `results/tables/` — place the final tables/results exported from the experiments here.
+
+Only **actual project outputs** should be added. Do not create or alter numerical results only to match the report.
+
+## Final report
+
+The final project report is available at:
+
+`docs/final_report.pdf`
 
 ## Dataset
 
-A virtually subject-aligned multimodal dataset was constructed from three public biometric datasets:
+The original biometric datasets are not redistributed in this repository. See `data/README.md` for the dataset information and usage notes.
 
-- **VGGFace2** — Face
-- **SOCOFing-real** — Fingerprint
-- **CASIA-Iris-Thousand** — Iris
+## Reproducibility note
 
-The resulting dataset contains:
+The experiments were executed in Kaggle. The source files therefore retain the `/kaggle/input` and `/kaggle/working` paths used by the executed project. To reproduce the experiments outside Kaggle, those paths need to be mapped to the corresponding local/project data locations.
 
-- 600 virtual subjects
-- 10 samples per modality per subject
-- 18,000 biometric samples in total
-- 480 training subjects
-- 60 validation subjects
-- 60 testing subjects
+## Verification
 
-A subject-level split was used to avoid identity overlap between training, validation, and testing.
-
-For validation and testing, balanced verification sets containing 2,700 genuine and 2,700 impostor comparisons were generated, giving 5,400 comparisons per split.
-
----
-
-## System Pipeline
-
-The overall pipeline consists of:
-
-1. Multimodal dataset preparation
-2. Subject-level train/validation/test splitting
-3. Balanced verification-pair generation
-4. Deep embedding extraction
-5. Embedding normalization
-6. Cancellable template transformation
-7. Same-key and cross-key evaluation
-8. Protected score normalization and fusion
-9. CKKS encrypted-domain matching
-10. Security, utility, and latency evaluation
-
----
-
-## Feature Extraction
-
-Different deep feature extractors are used for the three modalities:
-
-| Modality | Feature Extractor | Representation |
-|---|---|---|
-| Face | InceptionResnetV1 pretrained on VGGFace2 | 512-D embedding |
-| Fingerprint | ResNet-based fingerprint model | 512-D embedding |
-| Iris | EfficientNet-B3 | 512-D embedding |
-
-The same embedding representations are used across plain, protected, fused, and CKKS evaluation settings.
-
----
-
-## Cancellable Template Protection
-
-Cancellable protection is implemented using key-dependent random projection.
-
-The experiments evaluate:
-
-- Projection dimensions: 64, 128, 256, 512, and 1024
-- Binary and non-binary protected representations
-- Same-key verification
-- Cross-key verification
-
-Same-key evaluation measures retained verification utility.
-
-Cross-key evaluation is used as empirical evidence for practical unlinkability and renewability. It is not treated as a formal mathematical proof of irreversibility or unconditional unlinkability.
-
----
-
-## Multimodal Fusion
-
-Protected modality scores are normalized and combined using validation-selected score-level fusion.
-
-Both bimodal and trimodal configurations are evaluated:
-
-- Face + Fingerprint
-- Face + Iris
-- Fingerprint + Iris
-- Face + Fingerprint + Iris
-
-Fusion is analysed not only as an accuracy-improvement mechanism but also as a potential utility-recovery mechanism after cancellable transformation.
-
----
-
-## CKKS Encrypted Matching
-
-CKKS homomorphic encryption is used to evaluate encrypted similarity computation over protected biometric representations.
-
-The implementation uses **TenSEAL**.
-
-Main CKKS configuration:
+The intended verification chain is:
 
 ```text
-Scheme: CKKS
-poly_modulus_degree: 8192
-coeff_mod_bit_sizes: [60, 40, 40, 60]
-global_scale: 2^40
-Operation: Encrypted inner-product / similarity computation
+Source code
+    ->
+Kaggle experiment notebook
+    ->
+Generated experimental outputs
+    ->
+Figures / tables in results/
+    ->
+Final report in docs/
+```
+
+The repository does not claim that files placed in `results/` are newly generated unless they are actual outputs from the project. This keeps the GitHub repository consistent with the executed experiment.
